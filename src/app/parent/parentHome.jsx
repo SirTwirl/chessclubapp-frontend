@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import {
-    ActivityIndicator,
-    FlatList,
-    Image,
-    RefreshControl,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  Image,
+  RefreshControl,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native'
 import { api } from '../../api/client'
 
@@ -16,16 +16,19 @@ export default function ParentHomeScreen() {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  
+
   const fetchData = async () => {
     try {
-      const childrenRes = await api.get('/users/my-children').catch(() => null)
+      const meRes = await api.get('/users/me')
+      const parentUser = meRes.data
 
-      if (childrenRes && childrenRes.data && childrenRes.data.length > 0) {
-        setChildren(childrenRes.data)
-        const currentChildId = selectedChildId || childrenRes.data[0].id || childrenRes.data[0]._id
+      if (parentUser && parentUser.children && parentUser.children.length > 0) {
+        setChildren(parentUser.children)
+        const currentChild = parentUser.children[0]
+        const currentChildId =
+          selectedChildId || currentChild.id || currentChild._id || currentChild
         setSelectedChildId(currentChildId)
-        
+
         const tasksRes = await api.get(`/tasks?studentId=${currentChildId}`)
         setTasks(tasksRes.data)
       } else {
@@ -72,7 +75,12 @@ export default function ParentHomeScreen() {
         <View style={{ marginVertical: 10 }}>
           <Text>Wybierz dziecko:</Text>
           {children.map((child) => {
-            const childId = child.id || child._id
+            const childId = child.id || child._id || child
+            const childName =
+              typeof child === 'object'
+                ? `${child.name} ${child.surname}`
+                : 'Uczeń'
+
             return (
               <TouchableOpacity
                 key={childId}
@@ -80,8 +88,8 @@ export default function ParentHomeScreen() {
               >
                 <Text>
                   {selectedChildId === childId
-                    ? `[X] ${child.name} ${child.surname}`
-                    : `[ ] ${child.name} ${child.surname}`}
+                    ? `[X] ${childName}`
+                    : `[ ] ${childName}`}
                 </Text>
               </TouchableOpacity>
             )
