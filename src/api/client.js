@@ -1,3 +1,4 @@
+/* eslint-disable import/no-named-as-default-member */
 import axios from 'axios'
 
 export const BASE_URL = 'https://chessclubapp-backend.onrender.com/api'
@@ -8,7 +9,7 @@ export const api = axios.create({
 
 let token = null
 
-export const setToken = newToken => {
+export const setToken = (newToken) => {
   if (newToken) {
     token = `Bearer ${newToken}`
   } else {
