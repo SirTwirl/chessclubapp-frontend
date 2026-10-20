@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker'
 import { useEffect, useState } from 'react'
-import { Alert, Image, StyleSheet, Text, View } from 'react-native'
+import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import { api } from '../../api/client'
 import { colors } from '../../constants/colors'
 import { formatDate } from '../../utils/date'
@@ -15,6 +15,7 @@ export default function TaskCard({ task, role, refreshKey = 0 }) {
   const [answerImage, setAnswerImage] = useState(null)
   const [answersLoading, setAnswersLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const taskId = task?.id || task?._id
 
@@ -90,77 +91,89 @@ export default function TaskCard({ task, role, refreshKey = 0 }) {
 
   return (
     <View style={styles.taskCard}>
-      <Text style={styles.taskTitle}>{task.title}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityState={{ expanded }}
+        onPress={() => setExpanded((current) => !current)}
+        style={styles.taskHeader}
+      >
+        <Text style={styles.taskTitle}>{task.title}</Text>
+        <Text style={styles.expandIndicator}>{expanded ? '−' : '+'}</Text>
+      </Pressable>
 
-      {task.description ? (
-        <Text style={styles.taskDescription}>{task.description}</Text>
-      ) : null}
+      {expanded ? (
+        <View>
+          {task.description ? (
+            <Text style={styles.taskDescription}>{task.description}</Text>
+          ) : null}
 
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Grupa: </Text>
-        <Text style={styles.infoValue}>
-          {task.targetGroup || 'Wszystkie'}
-        </Text>
-      </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Grupa: </Text>
+            <Text style={styles.infoValue}>
+              {task.targetGroup || 'Wszystkie'}
+            </Text>
+          </View>
 
-      <View style={styles.infoRow}>
-        <Text style={styles.infoLabel}>Termin oddania: </Text>
-        <Text style={styles.dueDateValue}>
-          {formatDate(task.dueDate)}
-        </Text>
-      </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Termin oddania: </Text>
+            <Text style={styles.dueDateValue}>
+              {formatDate(task.dueDate)}
+            </Text>
+          </View>
 
-      {task.assignedBy ? (
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>Zadający: </Text>
-          <Text style={styles.infoValue}>
-            {task.assignedBy.name} {task.assignedBy.surname}
-          </Text>
+          {task.assignedBy ? (
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Zadający: </Text>
+              <Text style={styles.infoValue}>
+                {task.assignedBy.name} {task.assignedBy.surname}
+              </Text>
+            </View>
+          ) : null}
+
+          {task.imageUrl ? (
+            <Image
+              source={{ uri: task.imageUrl }}
+              style={styles.taskImage}
+              resizeMode="contain"
+            />
+          ) : null}
+
+          {role === 'student' ? (
+            answers.length > 0 ? (
+              <AnswerList answers={answers} title="Twoja odpowiedź" />
+            ) : (
+              <View style={styles.answerForm}>
+                <Text style={styles.sectionTitle}>Twoja odpowiedź</Text>
+                <AppInput
+                  placeholder="Wpisz rozwiązanie..."
+                  value={answerContent}
+                  onChangeText={setAnswerContent}
+                  multiline
+                  numberOfLines={4}
+                  containerStyle={styles.answerInput}
+                />
+                <ImageUploadPicker
+                  label="Zdjęcie rozwiązania (opcjonalnie)"
+                  imageUri={answerImageUri}
+                  onPickImage={pickAnswerImage}
+                  onRemoveImage={() => {
+                    setAnswerImageUri(null)
+                    setAnswerImage(null)
+                  }}
+                />
+                <AppButton
+                  title="Wyślij odpowiedź"
+                  onPress={submitAnswer}
+                  loading={submitting || answersLoading}
+                  disabled={answersLoading || (!answerContent.trim() && !answerImage)}
+                />
+              </View>
+            )
+          ) : (
+            <AnswerList answers={answers} loading={answersLoading} />
+          )}
         </View>
       ) : null}
-
-      {task.imageUrl ? (
-        <Image
-          source={{ uri: task.imageUrl }}
-          style={styles.taskImage}
-          resizeMode="contain"
-        />
-      ) : null}
-
-      {role === 'student' ? (
-        answers.length > 0 ? (
-          <AnswerList answers={answers} title="Twoja odpowiedź" />
-        ) : (
-          <View style={styles.answerForm}>
-            <Text style={styles.sectionTitle}>Twoja odpowiedź</Text>
-            <AppInput
-              placeholder="Wpisz rozwiązanie..."
-              value={answerContent}
-              onChangeText={setAnswerContent}
-              multiline
-              numberOfLines={4}
-              containerStyle={styles.answerInput}
-            />
-            <ImageUploadPicker
-              label="Zdjęcie rozwiązania (opcjonalnie)"
-              imageUri={answerImageUri}
-              onPickImage={pickAnswerImage}
-              onRemoveImage={() => {
-                setAnswerImageUri(null)
-                setAnswerImage(null)
-              }}
-            />
-            <AppButton
-              title="Wyślij odpowiedź"
-              onPress={submitAnswer}
-              loading={submitting || answersLoading}
-              disabled={answersLoading || (!answerContent.trim() && !answerImage)}
-            />
-          </View>
-        )
-      ) : (
-        <AnswerList answers={answers} loading={answersLoading} />
-      )}
     </View>
   )
 }
@@ -206,7 +219,21 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 6,
+    flex: 1,
+  },
+  taskHeader: {
+    minHeight: 32,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  expandIndicator: {
+    width: 28,
+    height: 28,
+    lineHeight: 26,
+    textAlign: 'center',
+    color: colors.primaryLight,
+    fontSize: 22,
+    fontWeight: '600',
   },
   taskDescription: {
     fontSize: 14,
