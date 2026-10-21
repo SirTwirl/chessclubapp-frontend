@@ -9,6 +9,7 @@ export default function CoachHomeScreen() {
   const handleChangeToAttendanceScreen = () => router.push('/coach/coachAttendance')
   const handleChangeToStudentListScreen = () => router.push('/coach/coachStudentList')
   const handleChangeToSetTasksScreen = () => router.push('/coach/coachSetTasks')
+  const handleChangeToTaskAnswersScreen = () => router.push('/coach/coachTasks')
 
   return (
     <ScreenContainer contentContainerStyle={styles.container}>
@@ -35,6 +36,12 @@ export default function CoachHomeScreen() {
           variant="secondary"
           title="♟️ Zadaj zadanie"
           onPress={handleChangeToSetTasksScreen}
+        />
+
+        <AppButton
+          variant="secondary"
+          title="📨 Zobacz odpowiedzi"
+          onPress={handleChangeToTaskAnswersScreen}
         />
       </AppCard>
     </ScreenContainer>
