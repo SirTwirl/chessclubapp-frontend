@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { colors } from '../../constants/colors'
+import AppHeader from './AppHeader'
 
 export default function ScreenContainer({
   children,
@@ -13,6 +14,9 @@ export default function ScreenContainer({
   if (scrollable) {
     return (
       <SafeAreaView style={styles.safeArea}>
+        <View style={[styles.scrollHeader, { maxWidth }]}>
+          <AppHeader />
+        </View>
         <ScrollView
           style={[styles.scrollContainer, style]}
           contentContainerStyle={[
@@ -39,6 +43,7 @@ export default function ScreenContainer({
           style,
         ]}
       >
+        <AppHeader />
         {children}
       </View>
     </SafeAreaView>
@@ -53,6 +58,12 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  scrollHeader: {
+    width: '100%',
+    alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 16,
   },
   container: {
     flex: 1,
