@@ -32,6 +32,8 @@ export default function LoginScreen() {
       setPassword('')
       if (user.role === 'coach') {
         router.replace('/coach/coachHome')
+      } else if (user.role === 'admin') {
+        router.replace('/admin/adminHome')
       } else if (user.role === 'student') {
         router.replace('/student/studentHome')
       } else if (user.role === 'parent') {
