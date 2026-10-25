@@ -1,5 +1,5 @@
 import { router } from 'expo-router'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import AppButton from '../../components/common/AppButton'
 import AppCard from '../../components/common/AppCard'
 import ScreenContainer from '../../components/common/ScreenContainer'
@@ -13,45 +13,50 @@ export default function CoachHomeScreen() {
 
   return (
     <ScreenContainer contentContainerStyle={styles.container}>
-      <AppCard style={styles.card}>
-        <ScreenHeader
-          title="PANEL TRENERA"
-          subtitle="Wybierz akcję do wykonania"
-          subtitleStyle={styles.subtitle}
-        />
+      <View style={styles.content}>
+        <AppCard style={styles.card}>
+          <ScreenHeader
+            title="PANEL TRENERA"
+            subtitle="Wybierz akcję do wykonania"
+            subtitleStyle={styles.subtitle}
+          />
 
-        <AppButton
-          variant="secondary"
-          title="📋 Sprawdź obecność"
-          onPress={handleChangeToAttendanceScreen}
-        />
+          <AppButton
+            variant="secondary"
+            title="📋 Sprawdź obecność"
+            onPress={handleChangeToAttendanceScreen}
+          />
 
-        <AppButton
-          variant="secondary"
-          title="👥 Lista uczniów"
-          onPress={handleChangeToStudentListScreen}
-        />
+          <AppButton
+            variant="secondary"
+            title="👥 Lista uczniów"
+            onPress={handleChangeToStudentListScreen}
+          />
 
-        <AppButton
-          variant="secondary"
-          title="♟️ Zadaj zadanie"
-          onPress={handleChangeToSetTasksScreen}
-        />
+          <AppButton
+            variant="secondary"
+            title="♟️ Zadaj zadanie"
+            onPress={handleChangeToSetTasksScreen}
+          />
 
-        <AppButton
-          variant="secondary"
-          title="📨 Zobacz odpowiedzi"
-          onPress={handleChangeToTaskAnswersScreen}
-        />
-      </AppCard>
+          <AppButton
+            variant="secondary"
+            title="📨 Zobacz odpowiedzi"
+            onPress={handleChangeToTaskAnswersScreen}
+          />
+        </AppCard>
+      </View>
     </ScreenContainer>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    paddingBottom: 24,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
-    paddingVertical: 24,
   },
   card: {
     maxWidth: 400,
